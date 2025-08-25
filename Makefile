@@ -43,6 +43,13 @@ server:
 	@go build -o bin/server ./cmd/server/
 	@echo "Server built: bin/server"
 
+# Build CLI
+cli:
+	@echo "Building CLI..."
+	@mkdir -p bin
+	@go build -o bin/local ./cmd/cli/
+	@echo "CLI built: bin/local"
+
 # Build server with embedded files (production)
 server-embed: wasm-prod
 	@echo "Preparing embedded files..."
@@ -54,7 +61,7 @@ server-embed: wasm-prod
 	@echo "Server built with embedded files: bin/server"
 
 # Build everything for production
-build: wasm-prod server-embed
+build: wasm-prod server-embed cli
 	@echo "Building frontend with Vite..."
 	@npm run build
 	@echo "Production build complete"

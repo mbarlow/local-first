@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/mbarlow/local-first/internal/monitoring"
 )
 
 func main() {
@@ -20,7 +22,7 @@ func main() {
 
 	var fileServer http.Handler
 
-	if *devMode || !hasEmbedded {
+	if *devMode {
 		// Development mode: serve from filesystem
 		absPath, err := filepath.Abs(*staticDir)
 		if err != nil {
@@ -35,6 +37,9 @@ func main() {
 		fileServer = http.FileServer(http.Dir(absPath))
 	} else {
 		// Production mode: serve from embedded files
+		if !hasEmbedded {
+			log.Fatal("No embedded files available. Build with -tags embed or use -dev flag")
+		}
 		webFS, err := fs.Sub(webFiles, "web")
 		if err != nil {
 			log.Fatalf("Failed to create sub filesystem: %v", err)
@@ -43,8 +48,14 @@ func main() {
 		fileServer = http.FileServer(http.FS(webFS))
 	}
 
+	// Add monitoring middleware
+	monitor := monitoring.NewMonitor()
+	
 	// Wrap the file server with CORS headers for WASM
-	handler := addCORSHeaders(fileServer)
+	corsHandler := addCORSHeaders(fileServer)
+	
+	// Add monitoring
+	handler := monitor.Middleware(corsHandler)
 
 	addr := fmt.Sprintf(":%s", *port)
 	log.Printf("Server starting on http://localhost%s", addr)

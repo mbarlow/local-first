@@ -27,6 +27,25 @@ make dev
 
 That's it! The app will automatically rebuild when you change Go or JavaScript files.
 
+### 🎯 Interactive CLI Dashboard
+
+For the best development experience, use the interactive CLI:
+
+```bash
+# Build and start the interactive dashboard
+make cli
+./bin/local dashboard
+
+# Or just run the dashboard directly
+./bin/local dash
+```
+
+The CLI dashboard provides:
+- 🟢 **Server Management** - Start/stop/restart with one key
+- 📊 **Request Monitoring** - Real-time request logs with color coding
+- 📈 **Performance Stats** - Response times and status code summaries
+- ⚡ **Hot Controls** - Quick keyboard shortcuts (s: start, x: stop, r: restart)
+
 ### 2️⃣ Alternative: Go Server Mode
 
 If you prefer using the Go server instead of Vite:
@@ -146,6 +165,7 @@ Once running, you'll have access to a web app that demonstrates:
 | Command | Description | Port |
 |---------|-------------|------|
 | `make install` | Install all dependencies (run this first!) | - |
+| `make cli` | Build the interactive CLI dashboard | - |
 | `make dev` | Start Vite dev server with hot reload | 5173 |
 | `make serve` | Run Go server in development mode | 8080 |
 | `make build` | Build everything for production | - |
@@ -156,6 +176,7 @@ Once running, you'll have access to a web app that demonstrates:
 | `make wasm` | Build WASM module (development) |
 | `make wasm-prod` | Build optimized WASM (production) |
 | `make server` | Build Go server binary |
+| `make cli` | Build interactive CLI dashboard |
 | `make server-embed` | Build server with embedded static files |
 
 ### Docker Commands
@@ -173,6 +194,14 @@ Once running, you'll have access to a web app that demonstrates:
 | `make lint` | Run linters |
 | `make clean` | Remove all build artifacts |
 | `make help` | Show available commands |
+
+### CLI Commands
+| Command | Description |
+|---------|-------------|
+| `./bin/local dashboard` | Start interactive TUI dashboard |
+| `./bin/local serve -p 8080` | Start server on specific port |
+| `./bin/local build --wasm` | Build only WASM module |
+| `./bin/local build --server` | Build only server binary |
 
 ## 🎯 API Functions
 
