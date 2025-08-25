@@ -269,7 +269,7 @@ class LocalStorage {
 }
 
 // Initialize local storage
-const localStorage = new LocalStorage();
+const localStorageDB = new LocalStorage();
 
 // Auto-save results (optional)
 const originalDisplayResult = client.displayResult;
@@ -278,7 +278,7 @@ client.displayResult = function (elementId, result) {
 
   // Save successful results to IndexedDB
   if (result && result.success) {
-    localStorage
+    localStorageDB
       .saveResult({
         operation: elementId.replace("Results", ""),
         result: result,

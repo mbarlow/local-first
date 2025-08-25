@@ -181,7 +181,7 @@
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
                 
                 html.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
+                window.localStorage.setItem('theme', newTheme);
                 
                 // Update theme toggle icon
                 const slider = document.querySelector('.theme-switch-slider');
@@ -198,7 +198,7 @@
             
             // Load saved theme
             document.addEventListener('DOMContentLoaded', function() {
-                const savedTheme = localStorage.getItem('theme') || 'light';
+                const savedTheme = window.localStorage.getItem('theme') || 'light';
                 document.documentElement.setAttribute('data-theme', savedTheme);
                 
                 const slider = document.querySelector('.theme-switch-slider');
