@@ -28,5 +28,29 @@ go.work.sum
 .env
 
 # Editor/IDE
-# .idea/
-# .vscode/
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build outputs
+bin/
+dist/
+*.wasm
+web/wasm_exec.js
+
+# Dependencies
+node_modules/
+vendor/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary embed directory
+cmd/server/web/
+
+# Claude AI
+.claude

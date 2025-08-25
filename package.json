@@ -1,0 +1,19 @@
+{
+  "name": "local-first",
+  "version": "1.0.0",
+  "description": "Local-first application with Go WASM and Vite",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "wasm:build": "GOOS=js GOARCH=wasm go build -o web/main.wasm cmd/wasm/main.go",
+    "wasm:build:prod": "GOOS=js GOARCH=wasm go build -ldflags=\"-s -w\" -o web/main.wasm cmd/wasm/main.go",
+    "serve": "go run cmd/server/main.go"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "@vitejs/plugin-basic-ssl": "^1.0.2"
+  },
+  "dependencies": {}
+}

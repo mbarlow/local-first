@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WASM Test</title>
+</head>
+<body>
+    <h1>Go WASM Test</h1>
+    <button onclick="testSimple()">Test Simple Function</button>
+    <button onclick="testAPI()">Test ProcessData</button>
+    <pre id="output"></pre>
+    
+    <script src="wasm_exec.js"></script>
+    <script>
+        const go = new Go();
+        let wasmReady = false;
+        
+        WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject)
+            .then((result) => {
+                go.run(result.instance);
+                // Wait for Go to initialize
+                setTimeout(() => {
+                    wasmReady = true;
+                    console.log("WASM Ready");
+                    console.log("goAPI available:", typeof window.goAPI);
+                    if (window.goAPI) {
+                        console.log("goAPI functions:", Object.keys(window.goAPI));
+                    }
+                }, 500);
+            })
+            .catch(err => {
+                console.error("Failed to load WASM:", err);
+            });
+        
+        function testSimple() {
+            const output = document.getElementById("output");
+            
+            if (!wasmReady) {
+                output.textContent = "WASM not ready yet";
+                return;
+            }
+            
+            console.log("Calling test function...");
+            try {
+                const result = window.goAPI.test();
+                console.log("Test result:", result);
+                output.textContent = "Simple test: " + JSON.stringify(result, null, 2);
+            } catch (err) {
+                console.error("Error:", err);
+                output.textContent = "Error: " + err.message;
+            }
+        }
+        
+        function testAPI() {
+            const output = document.getElementById("output");
+            
+            if (!wasmReady) {
+                output.textContent = "WASM not ready yet";
+                return;
+            }
+            
+            console.log("Calling processData...");
+            try {
+                const result = window.goAPI.processData("Hello, World!");
+                console.log("ProcessData result:", result);
+                output.textContent = "ProcessData: " + JSON.stringify(result, null, 2);
+            } catch (err) {
+                console.error("Error:", err);
+                output.textContent = "Error: " + err.message;
+            }
+        }
+    </script>
+</body>
+</html>

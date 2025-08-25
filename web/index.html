@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Go WASM API Demo</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            "gruvbox-bg": "#282828",
+                            "gruvbox-fg": "#ebdbb2",
+                            "gruvbox-blue": "#83a598",
+                            "gruvbox-green": "#b8bb26",
+                            "gruvbox-yellow": "#fabd2f",
+                            "gruvbox-red": "#fb4934",
+                        },
+                    },
+                },
+            };
+        </script>
+    </head>
+    <body class="bg-gruvbox-bg text-gruvbox-fg min-h-screen">
+        <div class="container mx-auto px-4 py-8">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold mb-2 text-gruvbox-yellow">
+                    Go WASM API Demo
+                </h1>
+                <p class="text-gruvbox-blue">
+                    Demonstrating Go WebAssembly with clean API design
+                </p>
+            </div>
+
+            <!-- API Status -->
+            <div id="apiStatus" class="mb-6 p-4 rounded-lg bg-gray-800">
+                <div class="flex items-center">
+                    <div
+                        id="statusIndicator"
+                        class="w-3 h-3 rounded-full mr-3 bg-gruvbox-red"
+                    ></div>
+                    <span id="statusText">Loading Go WASM API...</span>
+                </div>
+            </div>
+
+            <!-- Function Demos -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Text Processing -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h2 class="text-xl font-bold mb-4 text-gruvbox-green">
+                        Text Processing
+                    </h2>
+                    <div class="space-y-4">
+                        <textarea
+                            id="textInput"
+                            placeholder="Enter text to analyze..."
+                            class="w-full p-3 bg-gray-700 text-gruvbox-fg rounded-lg resize-vertical h-24"
+                        >
+The quick brown fox jumps over the lazy dog. This is a sample sentence for testing. Go WASM makes client-side processing powerful and efficient.</textarea
+                        >
+                        <button
+                            onclick="processText()"
+                            class="bg-gruvbox-blue hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+                        >
+                            Process Text
+                        </button>
+                        <div
+                            id="textResults"
+                            class="mt-4 p-3 bg-gray-900 rounded-lg hidden"
+                        >
+                            <pre class="text-sm overflow-x-auto"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Calculator -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h2 class="text-xl font-bold mb-4 text-gruvbox-green">
+                        Statistics Calculator
+                    </h2>
+                    <div class="space-y-4">
+                        <input
+                            id="numbersInput"
+                            placeholder="Enter numbers separated by commas..."
+                            value="1, 2, 3, 4, 5, 10, 15, 20, 25, 30"
+                            class="w-full p-3 bg-gray-700 text-gruvbox-fg rounded-lg"
+                        />
+                        <button
+                            onclick="calculateStats()"
+                            class="bg-gruvbox-green hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+                        >
+                            Calculate Statistics
+                        </button>
+                        <div
+                            id="statsResults"
+                            class="mt-4 p-3 bg-gray-900 rounded-lg hidden"
+                        >
+                            <pre class="text-sm overflow-x-auto"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Validation -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h2 class="text-xl font-bold mb-4 text-gruvbox-green">
+                        Input Validation
+                    </h2>
+                    <div class="space-y-4">
+                        <input
+                            id="validateInput"
+                            placeholder="Enter text to validate..."
+                            value="user@example.com"
+                            class="w-full p-3 bg-gray-700 text-gruvbox-fg rounded-lg"
+                        />
+                        <select
+                            id="validationType"
+                            class="w-full p-3 bg-gray-700 text-gruvbox-fg rounded-lg"
+                        >
+                            <option value="email">Email</option>
+                            <option value="url">URL</option>
+                            <option value="phone">Phone</option>
+                            <option value="json">JSON</option>
+                        </select>
+                        <button
+                            onclick="validateInput()"
+                            class="bg-gruvbox-yellow hover:bg-yellow-600 text-black px-4 py-2 rounded-lg"
+                        >
+                            Validate Input
+                        </button>
+                        <div
+                            id="validateResults"
+                            class="mt-4 p-3 bg-gray-900 rounded-lg hidden"
+                        >
+                            <pre class="text-sm overflow-x-auto"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ID Generator -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h2 class="text-xl font-bold mb-4 text-gruvbox-green">
+                        ID Generator
+                    </h2>
+                    <div class="space-y-4">
+                        <select
+                            id="idType"
+                            class="w-full p-3 bg-gray-700 text-gruvbox-fg rounded-lg"
+                        >
+                            <option value="uuid">UUID</option>
+                            <option value="short">Short ID</option>
+                            <option value="numeric">Numeric</option>
+                            <option value="timestamp">Timestamp</option>
+                        </select>
+                        <button
+                            onclick="generateID()"
+                            class="bg-gruvbox-red hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+                        >
+                            Generate ID
+                        </button>
+                        <div
+                            id="idResults"
+                            class="mt-4 p-3 bg-gray-900 rounded-lg hidden"
+                        >
+                            <pre class="text-sm overflow-x-auto"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JSON Formatter -->
+            <div class="mt-6 bg-gray-800 rounded-lg p-6">
+                <h2 class="text-xl font-bold mb-4 text-gruvbox-green">
+                    JSON Formatter
+                </h2>
+                <div class="space-y-4">
+                    <textarea
+                        id="jsonInput"
+                        placeholder="Enter JSON to format..."
+                        class="w-full p-3 bg-gray-700 text-gruvbox-fg rounded-lg resize-vertical h-24"
+                    >
+{"name":"John Doe","age":30,"city":"New York","hobbies":["reading","swimming","coding"]}</textarea
+                    >
+                    <button
+                        onclick="formatJSON()"
+                        class="bg-gruvbox-blue hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+                    >
+                        Format JSON
+                    </button>
+                    <div
+                        id="jsonResults"
+                        class="mt-4 p-3 bg-gray-900 rounded-lg hidden"
+                    >
+                        <pre class="text-sm overflow-x-auto"></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Information -->
+            <div class="mt-8 bg-gray-800 rounded-lg p-6">
+                <h2 class="text-xl font-bold mb-4 text-gruvbox-green">
+                    API Information
+                </h2>
+                <button
+                    onclick="getVersion()"
+                    class="bg-gruvbox-yellow hover:bg-yellow-600 text-black px-4 py-2 rounded-lg"
+                >
+                    Get Version Info
+                </button>
+                <div
+                    id="versionResults"
+                    class="mt-4 p-3 bg-gray-900 rounded-lg hidden"
+                >
+                    <pre class="text-sm overflow-x-auto"></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-12 text-center text-gruvbox-blue">
+            <p>Go WASM API Demo - Powered by Go WebAssembly</p>
+        </footer>
+
+        <!-- Scripts -->
+        <script src="wasm_exec.js"></script>
+        <script src="app.js"></script>
+    </body>
+</html>
