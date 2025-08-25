@@ -31,13 +31,13 @@ class GoWASMClient {
     const statusText = document.getElementById("statusText");
 
     if (errorMessage) {
-      statusIndicator.className = "w-3 h-3 rounded-full mr-3 bg-red-500";
+      statusIndicator.className = "status-dot error";
       statusText.textContent = errorMessage;
     } else if (this.isReady) {
-      statusIndicator.className = "w-3 h-3 rounded-full mr-3 bg-green-500";
+      statusIndicator.className = "status-dot ready";
       statusText.textContent = "Go WASM API Ready";
     } else {
-      statusIndicator.className = "w-3 h-3 rounded-full mr-3 bg-yellow-500";
+      statusIndicator.className = "status-dot loading";
       statusText.textContent = "Loading Go WASM API...";
     }
   }
@@ -86,21 +86,29 @@ class GoWASMClient {
 
   // Utility methods
   displayResult(elementId, result) {
-    const element = document.getElementById(elementId);
-    const pre = element.querySelector("pre");
-
-    if (!result) {
-      pre.textContent = "Error: No response from Go WASM API";
-      pre.className = "text-sm overflow-x-auto text-red-300";
-    } else if (result.success) {
-      pre.textContent = JSON.stringify(result, null, 2);
-      pre.className = "text-sm overflow-x-auto text-green-300";
+    if (typeof showResult === 'function') {
+      // Use enhanced showResult function if available (from HTML)
+      const isSuccess = result && result.success;
+      showResult(elementId, result, isSuccess);
     } else {
-      pre.textContent = `Error: ${result.error || result.message || "Unknown error"}`;
-      pre.className = "text-sm overflow-x-auto text-red-300";
-    }
+      // Fallback for compatibility
+      const element = document.getElementById(elementId);
+      const pre = element.querySelector("pre");
 
-    element.classList.remove("hidden");
+      if (!result) {
+        pre.textContent = "Error: No response from Go WASM API";
+        element.classList.add("error");
+      } else if (result.success) {
+        pre.textContent = JSON.stringify(result, null, 2);
+        element.classList.add("success");
+      } else {
+        pre.textContent = `Error: ${result.error || result.message || "Unknown error"}`;
+        element.classList.add("error");
+      }
+
+      element.classList.remove("hidden");
+      element.classList.add("show");
+    }
   }
 
   // Parse comma-separated numbers

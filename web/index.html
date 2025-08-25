@@ -1,229 +1,241 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Go WASM API Demo</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            tailwind.config = {
-                theme: {
-                    extend: {
-                        colors: {
-                            "gruvbox-bg": "#282828",
-                            "gruvbox-fg": "#ebdbb2",
-                            "gruvbox-blue": "#83a598",
-                            "gruvbox-green": "#b8bb26",
-                            "gruvbox-yellow": "#fabd2f",
-                            "gruvbox-red": "#fb4934",
-                        },
-                    },
-                },
-            };
-        </script>
+        <title>Local-First WASM Demo</title>
+        <link rel="stylesheet" href="style.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     </head>
-    <body class="bg-gruvbox-bg text-gruvbox-fg min-h-screen">
-        <div class="container mx-auto px-4 py-8">
+    <body>
+        <!-- Theme Toggle -->
+        <div class="theme-toggle">
+            <button class="theme-switch" onclick="toggleTheme()" aria-label="Toggle theme">
+                <div class="theme-switch-slider">🌙</div>
+            </button>
+        </div>
+
+        <div class="container">
             <!-- Header -->
-            <div class="text-center mb-8">
-                <h1 class="text-4xl font-bold mb-2 text-gruvbox-yellow">
-                    Go WASM API Demo
-                </h1>
-                <p class="text-gruvbox-blue">
-                    Demonstrating Go WebAssembly with clean API design
-                </p>
-            </div>
+            <header class="header animate-fade-in-up">
+                <div>
+                    <h1>Local-First WASM</h1>
+                    <p>Demonstrating Go WebAssembly with neumorphic design</p>
+                </div>
+            </header>
 
             <!-- API Status -->
-            <div id="apiStatus" class="mb-6 p-4 rounded-lg bg-gray-800">
-                <div class="flex items-center">
-                    <div
-                        id="statusIndicator"
-                        class="w-3 h-3 rounded-full mr-3 bg-gruvbox-red"
-                    ></div>
-                    <span id="statusText">Loading Go WASM API...</span>
-                </div>
+            <div class="status animate-slide-in-right">
+                <div class="status-dot loading" id="statusIndicator"></div>
+                <span id="statusText">Loading Go WASM API...</span>
             </div>
 
             <!-- Function Demos -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid">
                 <!-- Text Processing -->
-                <div class="bg-gray-800 rounded-lg p-6">
-                    <h2 class="text-xl font-bold mb-4 text-gruvbox-green">
-                        Text Processing
-                    </h2>
-                    <div class="space-y-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Text Processing</h2>
+                        <p class="card-subtitle">Analyze and process text with WASM</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="textInput">Input Text</label>
                         <textarea
                             id="textInput"
                             placeholder="Enter text to analyze..."
-                            class="w-full p-3 bg-gray-700 text-gruvbox-fg rounded-lg resize-vertical h-24"
-                        >
-The quick brown fox jumps over the lazy dog. This is a sample sentence for testing. Go WASM makes client-side processing powerful and efficient.</textarea
-                        >
-                        <button
-                            onclick="processText()"
-                            class="bg-gruvbox-blue hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
-                        >
-                            Process Text
-                        </button>
-                        <div
-                            id="textResults"
-                            class="mt-4 p-3 bg-gray-900 rounded-lg hidden"
-                        >
-                            <pre class="text-sm overflow-x-auto"></pre>
-                        </div>
+                            class="form-textarea"
+                        >The quick brown fox jumps over the lazy dog. This is a sample sentence for testing. Go WASM makes client-side processing powerful and efficient.</textarea>
+                    </div>
+                    <button onclick="processText()" class="btn btn-primary">
+                        Process Text
+                    </button>
+                    <div id="textResults" class="result hidden">
+                        <pre></pre>
                     </div>
                 </div>
 
                 <!-- Statistics Calculator -->
-                <div class="bg-gray-800 rounded-lg p-6">
-                    <h2 class="text-xl font-bold mb-4 text-gruvbox-green">
-                        Statistics Calculator
-                    </h2>
-                    <div class="space-y-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Statistics Calculator</h2>
+                        <p class="card-subtitle">Calculate statistical measures</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="numbersInput">Numbers</label>
                         <input
                             id="numbersInput"
                             placeholder="Enter numbers separated by commas..."
                             value="1, 2, 3, 4, 5, 10, 15, 20, 25, 30"
-                            class="w-full p-3 bg-gray-700 text-gruvbox-fg rounded-lg"
+                            class="form-input"
                         />
-                        <button
-                            onclick="calculateStats()"
-                            class="bg-gruvbox-green hover:bg-green-600 text-white px-4 py-2 rounded-lg"
-                        >
-                            Calculate Statistics
-                        </button>
-                        <div
-                            id="statsResults"
-                            class="mt-4 p-3 bg-gray-900 rounded-lg hidden"
-                        >
-                            <pre class="text-sm overflow-x-auto"></pre>
-                        </div>
+                    </div>
+                    <button onclick="calculateStats()" class="btn btn-success">
+                        Calculate Statistics
+                    </button>
+                    <div id="statsResults" class="result hidden">
+                        <pre></pre>
                     </div>
                 </div>
 
                 <!-- Input Validation -->
-                <div class="bg-gray-800 rounded-lg p-6">
-                    <h2 class="text-xl font-bold mb-4 text-gruvbox-green">
-                        Input Validation
-                    </h2>
-                    <div class="space-y-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Input Validation</h2>
+                        <p class="card-subtitle">Validate different input formats</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="validateInput">Input to Validate</label>
                         <input
                             id="validateInput"
                             placeholder="Enter text to validate..."
                             value="user@example.com"
-                            class="w-full p-3 bg-gray-700 text-gruvbox-fg rounded-lg"
+                            class="form-input"
                         />
-                        <select
-                            id="validationType"
-                            class="w-full p-3 bg-gray-700 text-gruvbox-fg rounded-lg"
-                        >
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="validationType">Validation Type</label>
+                        <select id="validationType" class="form-select">
                             <option value="email">Email</option>
                             <option value="url">URL</option>
                             <option value="phone">Phone</option>
                             <option value="json">JSON</option>
                         </select>
-                        <button
-                            onclick="validateInput()"
-                            class="bg-gruvbox-yellow hover:bg-yellow-600 text-black px-4 py-2 rounded-lg"
-                        >
-                            Validate Input
-                        </button>
-                        <div
-                            id="validateResults"
-                            class="mt-4 p-3 bg-gray-900 rounded-lg hidden"
-                        >
-                            <pre class="text-sm overflow-x-auto"></pre>
-                        </div>
+                    </div>
+                    <button onclick="validateInput()" class="btn btn-warning">
+                        Validate Input
+                    </button>
+                    <div id="validateResults" class="result hidden">
+                        <pre></pre>
                     </div>
                 </div>
 
                 <!-- ID Generator -->
-                <div class="bg-gray-800 rounded-lg p-6">
-                    <h2 class="text-xl font-bold mb-4 text-gruvbox-green">
-                        ID Generator
-                    </h2>
-                    <div class="space-y-4">
-                        <select
-                            id="idType"
-                            class="w-full p-3 bg-gray-700 text-gruvbox-fg rounded-lg"
-                        >
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">ID Generator</h2>
+                        <p class="card-subtitle">Generate unique identifiers</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="idType">ID Type</label>
+                        <select id="idType" class="form-select">
                             <option value="uuid">UUID</option>
                             <option value="short">Short ID</option>
                             <option value="numeric">Numeric</option>
                             <option value="timestamp">Timestamp</option>
                         </select>
-                        <button
-                            onclick="generateID()"
-                            class="bg-gruvbox-red hover:bg-red-600 text-white px-4 py-2 rounded-lg"
-                        >
-                            Generate ID
-                        </button>
-                        <div
-                            id="idResults"
-                            class="mt-4 p-3 bg-gray-900 rounded-lg hidden"
-                        >
-                            <pre class="text-sm overflow-x-auto"></pre>
-                        </div>
+                    </div>
+                    <button onclick="generateID()" class="btn btn-error">
+                        Generate ID
+                    </button>
+                    <div id="idResults" class="result hidden">
+                        <pre></pre>
                     </div>
                 </div>
             </div>
 
             <!-- JSON Formatter -->
-            <div class="mt-6 bg-gray-800 rounded-lg p-6">
-                <h2 class="text-xl font-bold mb-4 text-gruvbox-green">
-                    JSON Formatter
-                </h2>
-                <div class="space-y-4">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">JSON Formatter</h2>
+                    <p class="card-subtitle">Format and prettify JSON data</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="jsonInput">JSON Input</label>
                     <textarea
                         id="jsonInput"
                         placeholder="Enter JSON to format..."
-                        class="w-full p-3 bg-gray-700 text-gruvbox-fg rounded-lg resize-vertical h-24"
-                    >
-{"name":"John Doe","age":30,"city":"New York","hobbies":["reading","swimming","coding"]}</textarea
-                    >
-                    <button
-                        onclick="formatJSON()"
-                        class="bg-gruvbox-blue hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
-                    >
-                        Format JSON
-                    </button>
-                    <div
-                        id="jsonResults"
-                        class="mt-4 p-3 bg-gray-900 rounded-lg hidden"
-                    >
-                        <pre class="text-sm overflow-x-auto"></pre>
-                    </div>
+                        class="form-textarea"
+                    >{"name":"John Doe","age":30,"city":"New York","hobbies":["reading","swimming","coding"]}</textarea>
+                </div>
+                <button onclick="formatJSON()" class="btn btn-primary">
+                    Format JSON
+                </button>
+                <div id="jsonResults" class="result hidden">
+                    <pre></pre>
                 </div>
             </div>
 
             <!-- API Information -->
-            <div class="mt-8 bg-gray-800 rounded-lg p-6">
-                <h2 class="text-xl font-bold mb-4 text-gruvbox-green">
-                    API Information
-                </h2>
-                <button
-                    onclick="getVersion()"
-                    class="bg-gruvbox-yellow hover:bg-yellow-600 text-black px-4 py-2 rounded-lg"
-                >
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">API Information</h2>
+                    <p class="card-subtitle">Get runtime version info</p>
+                </div>
+                <button onclick="getVersion()" class="btn btn-warning">
                     Get Version Info
                 </button>
-                <div
-                    id="versionResults"
-                    class="mt-4 p-3 bg-gray-900 rounded-lg hidden"
-                >
-                    <pre class="text-sm overflow-x-auto"></pre>
+                <div id="versionResults" class="result hidden">
+                    <pre></pre>
                 </div>
             </div>
         </div>
 
-        <!-- Footer -->
-        <footer class="mt-12 text-center text-gruvbox-blue">
-            <p>Go WASM API Demo - Powered by Go WebAssembly</p>
-        </footer>
-
         <!-- Scripts -->
         <script src="wasm_exec.js"></script>
         <script src="app.js"></script>
+        <script>
+            // Theme switching functionality
+            function toggleTheme() {
+                const html = document.documentElement;
+                const currentTheme = html.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                
+                // Update theme toggle icon
+                const slider = document.querySelector('.theme-switch-slider');
+                slider.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+                
+                // Animate theme change
+                anime({
+                    targets: '.card, .status',
+                    scale: [1, 0.98, 1],
+                    duration: 300,
+                    easing: 'easeOutQuad'
+                });
+            }
+            
+            // Load saved theme
+            document.addEventListener('DOMContentLoaded', function() {
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                
+                const slider = document.querySelector('.theme-switch-slider');
+                slider.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+                
+                // Animate cards on load
+                anime({
+                    targets: '.card',
+                    translateY: [30, 0],
+                    opacity: [0, 1],
+                    delay: anime.stagger(100),
+                    duration: 800,
+                    easing: 'easeOutQuad'
+                });
+            });
+            
+            // Enhanced result display function
+            function showResult(elementId, data, isSuccess = true) {
+                const element = document.getElementById(elementId);
+                const pre = element.querySelector('pre');
+                
+                element.classList.remove('success', 'error', 'show');
+                element.classList.add(isSuccess ? 'success' : 'error');
+                
+                pre.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+                
+                element.classList.remove('hidden');
+                element.classList.add('show');
+                
+                // Animate result appearance
+                anime({
+                    targets: element,
+                    scale: [0.95, 1],
+                    duration: 300,
+                    easing: 'easeOutBack'
+                });
+            }
+        </script>
     </body>
 </html>
