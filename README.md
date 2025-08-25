@@ -307,6 +307,202 @@ make server-embed
 make docker-prod
 ```
 
+## 🛠️ Developer Guide: Adding New WASM Methods
+
+This section shows you exactly how to add a new Go function and expose it through WASM to JavaScript.
+
+### Step-by-Step Process
+
+#### 1️⃣ Add Core Business Logic
+Add your business logic to `internal/core/logic.go`:
+
+```go
+// EncodeBase64 encodes a string to base64
+func (dp *DataProcessor) EncodeBase64(input string) (map[string]interface{}, error) {
+    if input == "" {
+        return nil, fmt.Errorf("empty input provided")
+    }
+    
+    encoded := base64.StdEncoding.EncodeToString([]byte(input))
+    
+    return map[string]interface{}{
+        "original": input,
+        "encoded":  encoded,
+        "length":   len(encoded),
+    }, nil
+}
+```
+
+#### 2️⃣ Add API Handler
+Create a WASM-compatible handler in `internal/api/handlers.go`:
+
+```go
+// EncodeBase64 handles base64 encoding requests  
+func (h *Handler) EncodeBase64(this js.Value, inputs []js.Value) interface{} {
+    if len(inputs) == 0 {
+        return h.errorResponse("No input provided")
+    }
+
+    input := inputs[0].String()
+    
+    result, err := h.processor.EncodeBase64(input)
+    if err != nil {
+        return h.errorResponse(err.Error())
+    }
+
+    return h.successResponse(result, "Base64 encoding completed")
+}
+```
+
+#### 3️⃣ Register Function in WASM Entry Point
+Add the function to the global API in `cmd/wasm/main.go`:
+
+```go
+// Register each function individually on the goAPI object
+goAPI.Set("processData", js.FuncOf(apiHandler.ProcessData))
+goAPI.Set("validateInput", js.FuncOf(apiHandler.ValidateInput))
+goAPI.Set("calculateStats", js.FuncOf(apiHandler.CalculateStats))
+goAPI.Set("formatJSON", js.FuncOf(apiHandler.FormatJSON))
+goAPI.Set("generateID", js.FuncOf(apiHandler.GenerateID))
+goAPI.Set("getVersion", js.FuncOf(apiHandler.GetVersion))
+goAPI.Set("encodeBase64", js.FuncOf(apiHandler.EncodeBase64)) // ← Add this line
+```
+
+Also update the available functions log:
+```go
+fmt.Println("Available functions: processData, validateInput, calculateStats, formatJSON, generateID, getVersion, encodeBase64")
+```
+
+#### 4️⃣ Add JavaScript Client Function
+Add a wrapper function in `web/app.js`:
+
+```javascript
+function encodeBase64() {
+  const input = document.getElementById("base64Input").value;
+  const result = client.callAPI("encodeBase64", input);
+  client.displayResult("base64Results", result);
+}
+```
+
+#### 5️⃣ Add HTML Interface
+Add UI elements to `web/index.html`:
+
+```html
+<div class="demo-section">
+  <h3>Base64 Encoding</h3>
+  <div class="input-group">
+    <input type="text" id="base64Input" placeholder="Enter text to encode" />
+    <button onclick="encodeBase64()">Encode</button>
+  </div>
+  <div id="base64Results" class="result-display hidden">
+    <pre></pre>
+  </div>
+</div>
+```
+
+#### 6️⃣ Build and Test
+```bash
+# Rebuild WASM module
+make wasm
+
+# Start dev server
+make dev
+
+# Open http://localhost:5173 and test your new function!
+```
+
+### 🔄 Complete Workflow Example
+
+Let's trace through a complete example - adding a "reverseText" function:
+
+**1. Core Logic (`internal/core/logic.go`):**
+```go
+func (dp *DataProcessor) ReverseText(input string) (map[string]interface{}, error) {
+    if input == "" {
+        return nil, fmt.Errorf("empty input provided")
+    }
+    
+    runes := []rune(input)
+    for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+        runes[i], runes[j] = runes[j], runes[i]
+    }
+    
+    return map[string]interface{}{
+        "original": input,
+        "reversed": string(runes),
+        "length":   len(input),
+    }, nil
+}
+```
+
+**2. API Handler (`internal/api/handlers.go`):**
+```go
+func (h *Handler) ReverseText(this js.Value, inputs []js.Value) interface{} {
+    if len(inputs) == 0 {
+        return h.errorResponse("No input provided")
+    }
+
+    input := inputs[0].String()
+    result, err := h.processor.ReverseText(input)
+    if err != nil {
+        return h.errorResponse(err.Error())
+    }
+
+    return h.successResponse(result, "Text reversed successfully")
+}
+```
+
+**3. WASM Registration (`cmd/wasm/main.go`):**
+```go
+goAPI.Set("reverseText", js.FuncOf(apiHandler.ReverseText))
+```
+
+**4. JavaScript Client (`web/app.js`):**
+```javascript
+function reverseText() {
+  const input = document.getElementById("reverseInput").value;
+  const result = client.callAPI("reverseText", input);
+  client.displayResult("reverseResults", result);
+}
+```
+
+**5. HTML Interface (`web/index.html`):**
+```html
+<div class="demo-section">
+  <h3>Text Reversal</h3>
+  <input type="text" id="reverseInput" placeholder="Enter text to reverse" />
+  <button onclick="reverseText()">Reverse</button>
+  <div id="reverseResults" class="result-display hidden">
+    <pre></pre>
+  </div>
+</div>
+```
+
+### 💡 Best Practices
+
+**Data Flow:**
+- ✅ Keep business logic in `internal/core/`
+- ✅ Handle WASM integration in `internal/api/`
+- ✅ Register functions in `cmd/wasm/main.go`
+- ✅ Add JavaScript wrappers in `web/app.js`
+
+**Error Handling:**
+- ✅ Always validate inputs in API handlers
+- ✅ Return consistent response format: `{success: bool, data: any, message: string}`
+- ✅ Use `h.successResponse()` and `h.errorResponse()` helpers
+
+**Performance:**
+- ✅ Batch multiple Go calls when possible
+- ✅ Minimize data passed across JS ↔ Go boundary
+- ✅ Use appropriate Go data types (avoid interface{} when possible)
+
+**Testing:**
+```bash
+make wasm    # Rebuild after Go changes
+make test    # Run Go unit tests  
+make lint    # Check code quality
+```
+
 ## 🔍 Development Tips
 
 ### Hot Reload with Vite
